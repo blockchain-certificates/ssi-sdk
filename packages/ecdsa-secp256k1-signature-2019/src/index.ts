@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { EcdsaSecp256k1VerificationKey2019 } from '@bloomprotocol/ecdsa-secp256k1-verification-key-2019'
+import { EcdsaSecp256k1VerificationKey2019 } from '@blockcerts/ecdsa-secp256k1-verification-key-2019'
 // @ts-expect-error: implicit type import; not a ts package
 import jsonld from 'jsonld'
 // @ts-expect-error: implicit type import; not a ts package

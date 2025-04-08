@@ -1,4 +1,4 @@
-import { EcdsaSecp256k1VerificationKey2019 } from '@bloomprotocol/ecdsa-secp256k1-verification-key-2019'
+import { EcdsaSecp256k1VerificationKey2019 } from '@blockcerts/ecdsa-secp256k1-verification-key-2019'
 
 import type { IDidDocumentPublicKey } from '@decentralized-identity/did-common-typescript'
 import { EcdsaSecp256k1Signature2019 } from '../index'
