@@ -7,19 +7,21 @@ import { context } from './context';
 
 const SUITE_CONTEXT_URL = 'https://ns.did.ai/suites/secp256k1-2019/v1';
 
-const includesContext = ({ document, contextUrl }: { document: Record<string, unknown>; contextUrl: string }) => {
+const includesContext = ({ document, contextUrl }: { document: Record<string, unknown>; contextUrl: string[] }) => {
   const context = document['@context'];
-  return context === contextUrl || (Array.isArray(context) && context.includes(contextUrl));
+
+  if (Array.isArray(context)) {
+    return contextUrl.some(url => context.includes(url));
+  }
+
+  return contextUrl.includes(context as string);
 };
 
 const includesCompatibleContext = ({ document }: { document: Record<string, unknown> }) => {
-  const credContext = 'https://www.w3.org/2018/credentials/v1';
-  const securityContext = 'https://w3id.org/security/v2';
+  const credContext = ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/ns/credentials/v2'];
+  const securityContext = ['https://w3id.org/security/v2'];
 
-  const hasSecp256k12019 = includesContext({
-    document,
-    contextUrl: SUITE_CONTEXT_URL
-  });
+  const hasSecp256k12019 = includesContext({ document, contextUrl: [SUITE_CONTEXT_URL] });
   const hasCred = includesContext({ document, contextUrl: credContext });
   const hasSecV2 = includesContext({ document, contextUrl: securityContext });
 
