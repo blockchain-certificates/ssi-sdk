@@ -1,4 +1,5 @@
-import credentialsContextDoc from './contexts/credentials-v1.json';
+import credentialsV1ContextDoc from './contexts/credentials-v1.json';
+import credentialsV2ContextDoc from './contexts/credentials-v2.json';
 import didContextDoc from './contexts/did-v0.11.json';
 import secp256k12019ContextDoc from './contexts/secp256k1-2019-v1.json';
 import schemaContextDoc from './contexts/schema.json';
@@ -7,7 +8,8 @@ import keyPair from './keyPair.json';
 import keyPairRelativeId from './keyPairRelativePathId.json';
 
 const contextMap: { [url: string]: Record<string, unknown> } = {
-  'https://www.w3.org/2018/credentials/v1': credentialsContextDoc,
+  'https://www.w3.org/2018/credentials/v1': credentialsV1ContextDoc,
+  'https://www.w3.org/ns/credentials/v2': credentialsV2ContextDoc,
   'https://w3id.org/did/v0.11': didContextDoc,
   'https://ns.did.ai/suites/secp256k1-2019/v1': secp256k12019ContextDoc,
   'http://schema.org': schemaContextDoc

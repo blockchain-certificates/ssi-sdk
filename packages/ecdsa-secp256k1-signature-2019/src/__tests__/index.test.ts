@@ -151,6 +151,41 @@ describe('EcdsaSecp256k1Signature2019', () => {
         });
       });
 
+      it('if context includes "https://www.w3.org/ns/credentials/v2"', async () => {
+        const suite = new EcdsaSecp256k1Signature2019({
+          key: EcdsaSecp256k1VerificationKey2019.from(privateKeyPair),
+          date: '2021-04-20T00:00:00Z'
+        });
+
+        const signedDocument = await jsigs.sign(
+          {
+            ...document,
+            '@context': ['http://schema.org', 'https://www.w3.org/ns/credentials/v2']
+          },
+          {
+            suite,
+            purpose: new AssertionProofPurpose(),
+            documentLoader
+          }
+        );
+
+        expect(signedDocument).toEqual({
+          '@context': [
+            'http://schema.org',
+            'https://www.w3.org/ns/credentials/v2'
+          ],
+          '@type': 'Person',
+          'name': 'Bob Belcher',
+          'proof': {
+            'created': '2021-04-20T00:00:00Z',
+            'jws': 'eyJhbGciOiJFUzI1NksiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ..FHYR4aZSK8lpdJswPuc293-AfByJYXLLJdtIXkjUhh85i3ef_-6SOBqC0PnsVM7KVyvAk13r0lK22qI5qfbs0g',
+            'proofPurpose': 'assertionMethod',
+            'type': 'EcdsaSecp256k1Signature2019',
+            'verificationMethod': 'did:example:signer#123'
+          }
+        });
+      });
+
       it('if context includes "https://w3id.org/security/v2"', async () => {
         const suite = new EcdsaSecp256k1Signature2019({
           key: EcdsaSecp256k1VerificationKey2019.from(privateKeyPair),
