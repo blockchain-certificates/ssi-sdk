@@ -1,7 +1,5 @@
 import { EcdsaSecp256k1VerificationKey2019 } from '@blockcerts/ecdsa-secp256k1-verification-key-2019';
-// @ts-expect-error: implicit type import; not a ts package
 import jsonld from 'jsonld';
-// @ts-expect-error: implicit type import; not a ts package
 import jsigs from 'jsonld-signatures';
 import { context } from './context';
 
@@ -45,12 +43,12 @@ const includesCompatibleContext = ({ document }: { document: Record<string, unkn
 };
 
 type EcdsaSecp256k1Signature2019Options = {
-  key?: EcdsaSecp256k1VerificationKey2019
-  signer?: { sign: ({ verifyData, proof }: { verifyData: Uint8Array; proof: Record<string, any> }) => any; id: string }
-  verifier?: { verify: ({ data, signature }: { data: Uint8Array, signature: any }) => any; id: string }
-  proof?: Record<string, unknown>
-  date?: Date | string
-  useNativeCanonize?: boolean
+  key?: EcdsaSecp256k1VerificationKey2019;
+  signer?: { sign: ({ verifyData, proof }: { verifyData: Uint8Array; proof: Record<string, any> }) => any; id: string };
+  verifier?: { verify: ({ data, signature }: { data: Uint8Array, signature: any }) => any; id: string };
+  proof?: Record<string, unknown>;
+  date?: Date | string;
+  useNativeCanonize?: boolean;
 }
 
 export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignature {
@@ -68,10 +66,12 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
   }
 
   async sign({ verifyData, proof }: { verifyData: Uint8Array; proof: Record<string, any> }) {
+    // @ts-expect-error signer comes from LinkedDataSignature class but no definition is available
     if (!(this.signer && typeof this.signer.sign === 'function')) {
       throw new Error('A signer API has not been specified.');
     }
 
+    // @ts-expect-error signer comes from LinkedDataSignature class but no definition is available
     const jws = await this.signer.sign({ data: verifyData });
 
     return {
@@ -95,8 +95,10 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
       throw new TypeError('The proof does not include a valid "jws" property.');
     }
 
+    // @ts-expect-error verifier comes from LinkedDataSignature class but no definition is available
     let { verifier } = this;
     if (!verifier) {
+      // @ts-expect-error LDKeyClass comes from LinkedDataSignature class but no definition is available
       const key = await this.LDKeyClass.from(verificationMethod);
       verifier = key.verifier();
     }
@@ -106,6 +108,7 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
 
   async assertVerificationMethod({ verificationMethod }: { verificationMethod: Record<string, unknown> }) {
     if (!includesCompatibleContext({ document: verificationMethod })) {
+      // @ts-expect-error contextUrl comes from LinkedDataSignature class but no definition is available
       throw new TypeError(`The verification method (key) must contain "${this.contextUrl}".`);
     }
 
@@ -126,7 +129,9 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
     // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     documentLoader: Function
   }) {
+    // @ts-expect-error key comes from LinkedDataSignature class but no definition is available
     if (this.key) {
+      // @ts-expect-error key comes from LinkedDataSignature class but no definition is available
       return this.key.export({ publicKey: true });
     }
 
@@ -139,6 +144,7 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
     const framed = await jsonld.frame(
       verificationMethod,
       {
+        // @ts-expect-error contextUrl comes from LinkedDataSignature class but no definition is available
         '@context': this.contextUrl,
         '@embed': '@always',
         id: verificationMethod
@@ -188,6 +194,7 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
     ) {
       return false;
     }
+    // @ts-expect-error key comes from LinkedDataSignature class but no definition is available
     if (!this.key) {
       // no key specified, so assume this suite matches and it can be retrieved
       return true;
@@ -208,9 +215,12 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
   }
 
   private isVerificationMethodMatchingKeyId(verificationMethod: string): boolean {
+    // @ts-expect-error key comes from LinkedDataSignature class but no definition is available
     return verificationMethod === this.key.id || verificationMethod === `${this.key.controller}${this.key.id}`;
   }
 }
 
+// @ts-expect-error defining it at class does not seem to work, moving on
 EcdsaSecp256k1Signature2019.CONTEXT_URL = SUITE_CONTEXT_URL;
+// @ts-expect-error defining it at class does not seem to work, moving on
 EcdsaSecp256k1Signature2019.CONTEXT = context;
