@@ -4,6 +4,7 @@ import jsigs from 'jsonld-signatures';
 import { context } from './context';
 
 const SUITE_CONTEXT_URL = 'https://ns.did.ai/suites/secp256k1-2019/v1';
+const W3ID_SUITE_CONTEXT_URL = 'https://w3id.org/security/suites/secp256k1-2019/v1';
 const VC_V1_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 const VC_V2_CONTEXT_URL = 'https://www.w3.org/ns/credentials/v2';
 
@@ -17,31 +18,42 @@ const includesContext = ({ document, contextUrl }: { document: Record<string, un
   return contextUrl.includes(context as string);
 };
 
-const includesCompatibleContext = ({ document }: { document: Record<string, unknown> }) => {
-  const credContext = [VC_V1_CONTEXT_URL, VC_V2_CONTEXT_URL]; // do not fail matchProof check
-  const securityContext = ['https://w3id.org/security/v2'];
-
-  const hasSecp256k12019 = includesContext({ document, contextUrl: [SUITE_CONTEXT_URL] });
-  const hasCred = includesContext({ document, contextUrl: credContext });
-  const hasSecV2 = includesContext({ document, contextUrl: securityContext });
-
-  if (hasSecp256k12019 && hasCred) {
-     
+const includesCompatibleContext = ({
+                                     document
+                                   }) => {
+  const hasSecp256k12019 = includesContext({
+    document,
+    contextUrl: [SUITE_CONTEXT_URL, W3ID_SUITE_CONTEXT_URL]
+  });
+  const hasCredV1 = includesContext({
+    document,
+    contextUrl: [VC_V1_CONTEXT_URL]
+  });
+  const hasCredV2 = includesContext({
+    document,
+    contextUrl: [VC_V2_CONTEXT_URL]
+  });
+  const hasSecV2 = includesContext({
+    document,
+    contextUrl: ['https://w3id.org/security/v2']
+  });
+  if (hasSecp256k12019 && hasCredV1) {
     console.warn('Warning: The secp256k1-2019/v1 and credentials/v1 contexts are incompatible.');
-     
     console.warn('For VCs using EcdsaSecp256k1Signature2019 suite, using the credentials/v1 context is sufficient.');
     return false;
   }
-
+  if (!hasSecp256k12019 && hasCredV2) {
+    console.warn('This library does not (yet) follow the Data Integrity Proof format.');
+    console.warn('When using the credentials/v2 context, consumers need to specify the secp256k1-2019/v1 context.');
+    return false;
+  }
   if (hasSecp256k12019 && hasSecV2) {
-     
     console.warn('Warning: The secp256k1-2019/v1 and security/v2 contexts are incompatible.');
-     
     console.warn('For VCs using EcdsaSecp256k1Signature2019 suite, using the security/v2 context is sufficient.');
     return false;
   }
 
-  return hasSecp256k12019 || hasCred || hasSecV2;
+  return hasSecp256k12019 || hasCredV1 || hasSecV2;
 };
 
 type EcdsaSecp256k1Signature2019Options = {
