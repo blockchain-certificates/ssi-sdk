@@ -4,6 +4,8 @@ import jsigs from 'jsonld-signatures';
 import { context } from './context';
 
 const SUITE_CONTEXT_URL = 'https://ns.did.ai/suites/secp256k1-2019/v1';
+const VC_V1_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
+const VC_V2_CONTEXT_URL = 'https://www.w3.org/ns/credentials/v2';
 
 const includesContext = ({ document, contextUrl }: { document: Record<string, unknown>; contextUrl: string[] }) => {
   const context = document['@context'];
@@ -16,7 +18,7 @@ const includesContext = ({ document, contextUrl }: { document: Record<string, un
 };
 
 const includesCompatibleContext = ({ document }: { document: Record<string, unknown> }) => {
-  const credContext = ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/ns/credentials/v2'];
+  const credContext = [VC_V1_CONTEXT_URL, VC_V2_CONTEXT_URL]; // do not fail matchProof check
   const securityContext = ['https://w3id.org/security/v2'];
 
   const hasSecp256k12019 = includesContext({ document, contextUrl: [SUITE_CONTEXT_URL] });
@@ -207,7 +209,7 @@ export class EcdsaSecp256k1Signature2019 extends jsigs.suites.LinkedDataSignatur
   }
 
   ensureSuiteContext({ document, addSuiteContext }: { document: Record<string, unknown>; addSuiteContext?: boolean }) {
-    if (includesCompatibleContext({ document })) {
+    if (includesCompatibleContext({ document }) && !includesContext({ document, contextUrl: [VC_V2_CONTEXT_URL] })) {
       return;
     }
 
