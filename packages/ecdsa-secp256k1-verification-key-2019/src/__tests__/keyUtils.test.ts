@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import * as keyUtils from '../keyUtils'
 
 import { keyConfig } from './__fixtures__'
