@@ -18,8 +18,10 @@
     "skipLibCheck": true
   },
   "compileOnSave": false,
+  "include": ["src"],
   "exclude": [
     "node_modules",
-    "tests"
+    "dist-old",
+    "src/__tests__"
   ]
 }
