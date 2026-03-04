@@ -3,6 +3,7 @@ import secp256k1 from 'secp256k1'
 import keyto from '@trust/keyto'
 // @ts-expect-error: implicit type import; not a ts package
 import * as base58 from 'base58-universal'
+// @ts-expect-error: implicit type import; not a ts package
 import * as base64url from 'base64url-universal'
 
 const compressedHexEncodedPublicKeyLength = 66
@@ -134,10 +135,20 @@ export const publicKeyJWKFrom = {
         ? Buffer.from(secp256k1.publicKeyConvert(Buffer.from(publicKeyHex, 'hex'), false)).toString('hex')
         : publicKeyHex
 
-    console.log('publicKeyHexFrom', key)
+    const point = {
+      x: Buffer.from(key.slice(2, key.length / 2 + 1), 'hex'),
+      y: Buffer.from(key.slice(key.length / 2 + 1), 'hex'),
+    }
+
+    const jwk = {
+      x: base64url.encode(point.x),
+      y: base64url.encode(point.y),
+    }
+
     return {
-      ...keyto.from(key, 'blk').toJwk('public'),
+      ...jwk,
       crv: 'secp256k1',
+      kty: 'EC',
       kid,
     }
   },
