@@ -21,7 +21,6 @@
   "include": ["src"],
   "exclude": [
     "node_modules",
-    "dist-old",
     "src/__tests__"
   ]
 }
