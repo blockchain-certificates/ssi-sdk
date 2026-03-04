@@ -33,14 +33,13 @@
     "prepublishOnly": "npm run lint && npm run test"
   },
   "dependencies": {
-    "@trust/keyto": "^1.0.1",
+    "@noble/curves": "^2.0.1",
     "base58-universal": "^2.0.0",
     "base64url": "^3.0.1",
     "base64url-universal": "^2.0.0",
     "create-hash": "^1.2.0",
     "crypto-ld": "^6.0.0",
-    "randombytes": "^2.1.0",
-    "secp256k1": "^5.0.0"
+    "randombytes": "^2.1.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.14.0",

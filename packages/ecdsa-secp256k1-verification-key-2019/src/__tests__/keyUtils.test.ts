@@ -79,7 +79,7 @@ describe('privateKeyUint8ArrayFrom', () => {
   })
 })
 
-describe.only('publicKeyJWKFrom', () => {
+describe('publicKeyJWKFrom', () => {
   const from = keyUtils.publicKeyJWKFrom
   const expected = keyConfig.publicKeyJWK
   const kid = 'kid'
@@ -88,10 +88,7 @@ describe.only('publicKeyJWKFrom', () => {
     expect(from.publicKeyBase58(keyConfig.publicKeyBase58, kid)).toEqual(expected)
   })
 
-  test.only('publicKeyHex', () => {
-    console.log('base', keyConfig.publicKeyHex);
-    console.log('converted', from.publicKeyHex(keyConfig.publicKeyHex, kid))
-    console.log('expected', expected);
+  test('publicKeyHex', () => {
     expect(from.publicKeyHex(keyConfig.publicKeyHex, kid)).toEqual(expected)
   })
 

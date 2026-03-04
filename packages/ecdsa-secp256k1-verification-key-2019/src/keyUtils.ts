@@ -1,6 +1,5 @@
-import secp256k1 from 'secp256k1'
-// @ts-expect-error: implicit type import; not a ts package
-import keyto from '@trust/keyto'
+// eslint-disable-next-line import/extensions
+import { secp256k1 } from '@noble/curves/secp256k1.js'
 // @ts-expect-error: implicit type import; not a ts package
 import * as base58 from 'base58-universal'
 // @ts-expect-error: implicit type import; not a ts package
@@ -55,7 +54,6 @@ function toPublicKeyBytes({ jwk } = {} as any): Uint8Array {
   // convert `x` coordinate to compressed public key
   const x = base64url.decode(jwk.x);
   const y = base64url.decode(jwk.y);
-  console.log(x, y)
   // public key size is always secret key size + 1
   const publicKeySize = secretKeySize + 1;
   const publicKey = new Uint8Array(publicKeySize);
@@ -80,12 +78,30 @@ export function toSecretKeyBytes({jwk} = {} as any): Uint8Array {
   return secretKey;
 }
 
+function bigIntToBytes(num, length = null) {
+  let hex = num.toString(16);
+  if (hex.length % 2) hex = '0' + hex;
+
+  let bytes = Uint8Array.from(hex.match(/.{2}/g).map(b => parseInt(b, 16)));
+
+  if (length !== null) {
+    if (bytes.length > length) {
+      throw new Error('BigInt too large');
+    }
+    const padded = new Uint8Array(length);
+    padded.set(bytes, length - bytes.length); // left pad
+    bytes = padded;
+  }
+
+  return bytes;
+}
+
 export const publicKeyHexFrom = {
   publicKeyBase58: (publicKeyBase58: string): string => Buffer.from(base58.decode(publicKeyBase58)).toString('hex'),
   publicKeyJWK: (jwk: PublicKeyJWK): string => Buffer.from(toPublicKeyBytes({ jwk })).toString('hex'),
   publicKeyUint8Array: (publicKeyUint8Array: Uint8Array): string => Buffer.from(publicKeyUint8Array).toString('hex'),
   privateKeyHex: (privateKeyHex: string): string =>
-    Buffer.from(secp256k1.publicKeyCreate(new Uint8Array(Buffer.from(privateKeyHex, 'hex')))).toString('hex'),
+    Buffer.from(secp256k1.getPublicKey(new Uint8Array(Buffer.from(privateKeyHex, 'hex')))).toString('hex'),
 }
 
 export const privateKeyHexFrom = {
@@ -98,9 +114,6 @@ export const publicKeyUint8ArrayFrom = {
   publicKeyBase58: (publicKeyBase58: string): Uint8Array => base58.decode(publicKeyBase58),
   publicKeyHex: (publicKeyHex: string): Uint8Array => Uint8Array.from(Buffer.from(publicKeyHex, 'hex')),
   publicKeyJWK: (jwk: PublicKeyJWK): Uint8Array => {
-    console.log('jwk', jwk);
-    console.log('bytes', toPublicKeyBytes({ jwk }))
-    console.log(publicKeyHexFrom.publicKeyJWK(jwk))
     let asBuffer = Buffer.from(publicKeyHexFrom.publicKeyJWK(jwk), 'hex')
     let padding = 32 - asBuffer.length
     while (padding > 0) {
@@ -109,7 +122,7 @@ export const publicKeyUint8ArrayFrom = {
     }
     return Uint8Array.from(asBuffer)
   },
-  privateKeyUint8Array: (privateKeyUint8Array: Uint8Array): Uint8Array => secp256k1.publicKeyCreate(privateKeyUint8Array),
+  privateKeyUint8Array: (privateKeyUint8Array: Uint8Array): Uint8Array => secp256k1.getPublicKey(privateKeyUint8Array),
 }
 
 export const privateKeyUint8ArrayFrom = {
@@ -130,14 +143,18 @@ export const publicKeyJWKFrom = {
   publicKeyBase58: (publicKeybase58: string, kid: string): PublicKeyJWK =>
     publicKeyJWKFrom.publicKeyHex(Buffer.from(base58.decode(publicKeybase58)).toString('hex'), kid),
   publicKeyHex: (publicKeyHex: string, kid: string): PublicKeyJWK => {
-    const key =
-      publicKeyHex.length === compressedHexEncodedPublicKeyLength
-        ? Buffer.from(secp256k1.publicKeyConvert(Buffer.from(publicKeyHex, 'hex'), false)).toString('hex')
-        : publicKeyHex
-
-    const point = {
-      x: Buffer.from(key.slice(2, key.length / 2 + 1), 'hex'),
-      y: Buffer.from(key.slice(key.length / 2 + 1), 'hex'),
+    let point
+    if (publicKeyHex.length === compressedHexEncodedPublicKeyLength) {
+      const P = secp256k1.Point.fromHex(publicKeyHex)
+      point = {
+        x: bigIntToBytes(P.x),
+        y: bigIntToBytes(P.y),
+      }
+    } else {
+      point = {
+        x: Buffer.from(publicKeyHex.slice(2, publicKeyHex.length / 2 + 1), 'hex'),
+        y: Buffer.from(publicKeyHex.slice(publicKeyHex.length / 2 + 1), 'hex'),
+      }
     }
 
     const jwk = {
@@ -165,11 +182,16 @@ export const publicKeyJWKFrom = {
 export const privateKeyJWKFrom = {
   privateKeyBase58: (privateKeybase58: string, kid: string): PrivateKeyJWK =>
     privateKeyJWKFrom.privateKeyHex(Buffer.from(base58.decode(privateKeybase58)).toString('hex'), kid),
-  privateKeyHex: (privateKeyHex: string, kid: string): PrivateKeyJWK => ({
-    ...keyto.from(privateKeyHex, 'blk').toJwk('private'),
-    crv: 'secp256k1',
-    kid,
-  }),
+  privateKeyHex: (privateKeyHex: string, kid: string): PrivateKeyJWK => {
+    const priv = Buffer.from(privateKeyHex, 'hex')
+    const uncompressedPub = secp256k1.getPublicKey(priv, false)
+
+    const publicKeyJwk = publicKeyJWKFrom.publicKeyHex(Buffer.from(uncompressedPub).toString('hex'), kid)
+    return {
+      ...publicKeyJwk,
+      d: base64url.encode(Buffer.from(priv, 'hex')),
+    }
+  },
   privateKeyUint8Array: (privateKeyUint8Array: Uint8Array, kid: string): PrivateKeyJWK =>
     privateKeyJWKFrom.privateKeyHex(privateKeyHexFrom.privateKeyUint8Array(privateKeyUint8Array), kid),
 }
