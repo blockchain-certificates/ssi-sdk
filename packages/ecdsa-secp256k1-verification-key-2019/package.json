@@ -47,7 +47,6 @@
     "@bloomprotocol/prettier-config": "2.0.0-beta.0",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/create-hash": "^1.2.2",
     "@types/randombytes": "^2.0.0",
