@@ -1,7 +1,7 @@
 {
   "name": "@blockcerts/ecdsa-secp256k1-verification-key-2019",
   "description": "TypeScript library for generating and working with EcdsaSecp256k1VerificationKey2019 key pairs, for use with crypto-ld.",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "author": "Bloom Team <team@bloom.co>",
   "license": "Apache-2.0",
   "repository": "https://github.com/hellobloom/ssi-sdk/tree/main/packages/ecdsa-secp256k1-verification-key-2019",
@@ -33,7 +33,7 @@
     "prepublishOnly": "npm run lint && npm run test"
   },
   "dependencies": {
-    "@noble/curves": "^2.0.1",
+    "@noble/secp256k1": "^3.0.0",
     "base58-universal": "^2.0.0",
     "base64url": "^3.0.1",
     "base64url-universal": "^2.0.0",
@@ -68,8 +68,6 @@
     "**/eslint-plugin-prettier": "^3.4.0",
     "**/eslint-plugin-react": "^7.23.2",
     "**/eslint-plugin-react-hooks": "^4.2.0",
-    "**/jest": "^26.6.3",
-    "**/ts-jest": "^26.4.4",
     "**/prettier": "^2.3.0",
     "**/typescript": "^4.3.2"
   },

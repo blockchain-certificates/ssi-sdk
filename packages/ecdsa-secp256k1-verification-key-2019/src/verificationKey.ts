@@ -1,7 +1,7 @@
 // @ts-nocheck
 import base64url from 'base64url'
+import * as secp256k1 from '@noble/secp256k1'
 import createHash from 'create-hash'
-import * as secp256k1 from 'secp256k1'
 import randomBytes from 'randombytes'
 // @ts-expect-error: implicit type import; not a ts package
 import cryptoLd from 'crypto-ld'
@@ -49,7 +49,7 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
     super(options)
 
     if (privateKeyBase58 && !publicKeyBase58) {
-      const publicKey = secp256k1.publicKeyCreate(base58.decode(privateKeyBase58))
+      const publicKey = secp256k1.getPublicKey(base58.decode(privateKeyBase58))
       this.publicKeyBase58 = base58.encode(publicKey)
     } else {
       this.publicKeyBase58 = publicKeyBase58
@@ -82,17 +82,17 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
     compressed,
     ...keyPairOptions
   }: Omit<EcdsaSecp256k1VerificationKey2019Options, 'publicKeyBase58' | 'privateKeyBase58'> & { seed?: Uint8Array; compressed?: boolean }) {
-    if (seed && !secp256k1.privateKeyVerify(seed)) {
+    if (seed && !secp256k1.utils.isValidSecretKey(seed)) {
       throw new Error('Provided seed is not a valid private key')
     }
 
     let privateKey = seed
 
-    while (typeof privateKey === 'undefined' || !secp256k1.privateKeyVerify(privateKey)) {
+    while (typeof privateKey === 'undefined' || !secp256k1.utils.isValidSecretKey(privateKey)) {
       privateKey = new Uint8Array(randomBytes(32))
     }
 
-    const publicKey = secp256k1.publicKeyCreate(privateKey, compressed)
+    const publicKey = secp256k1.getPublicKey(privateKey, compressed)
 
     return new EcdsaSecp256k1VerificationKey2019({
       publicKeyBase58: base58.encode(publicKey),
@@ -167,7 +167,7 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
           ),
         )
 
-        const { signature } = secp256k1.ecdsaSign(digest, base58.decode(privateKeyBase58))
+        const { signature } = await secp256k1.signAsync(digest, base58.decode(privateKeyBase58))
         const encodedSignature = base64url.encode(Buffer.from(signature))
 
         return `${encodedHeader}..${encodedSignature}`
@@ -208,11 +208,7 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
 
         let verified: boolean
         try {
-          verified = secp256k1.ecdsaVerify(
-            Buffer.from(base64url.decode(encodedSignature, 'hex'), 'hex'),
-            digest,
-            base58.decode(publicKeyBase58),
-          )
+          verified = secp256k1.verify(Buffer.from(base64url.decode(encodedSignature, 'hex'), 'hex'), digest, base58.decode(publicKeyBase58))
         } catch (e) {
           verified = false
         }
