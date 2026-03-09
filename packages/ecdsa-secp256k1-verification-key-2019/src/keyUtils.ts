@@ -31,7 +31,7 @@ const ECDSA_CURVE = {
   secp256k1: 'K-256',
 }
 
-function getSecretKeySize({ curve }) {
+function getSecretKeySize({ curve }: { curve: string }): number {
   if (curve === ECDSA_CURVE.P256 || curve === ECDSA_CURVE.secp256k1 || curve === 'secp256k1') {
     return 32
   }
@@ -77,11 +77,11 @@ export function toSecretKeyBytes({ jwk } = {} as any): Uint8Array {
   return secretKey
 }
 
-function bigIntToBytes(num, length = null) {
+function bigIntToBytes(num: bigint, length = null) {
   let hex = num.toString(16)
   if (hex.length % 2) hex = `0${hex}`
 
-  let bytes = Uint8Array.from(hex.match(/.{2}/g).map((b) => parseInt(b, 16)))
+  let bytes = Uint8Array.from(hex.match(/.{2}/g)!.map((b: string) => parseInt(b, 16)))
 
   if (length !== null) {
     if (bytes.length > length) {
@@ -188,7 +188,7 @@ export const privateKeyJWKFrom = {
     const publicKeyJwk = publicKeyJWKFrom.publicKeyHex(Buffer.from(uncompressedPub).toString('hex'), kid)
     return {
       ...publicKeyJwk,
-      d: base64url.encode(Buffer.from(priv, 'hex')),
+      d: base64url.encode(priv),
     }
   },
   privateKeyUint8Array: (privateKeyUint8Array: Uint8Array, kid: string): PrivateKeyJWK =>
