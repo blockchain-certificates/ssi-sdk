@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/extensions
-import { secp256k1 } from '@noble/curves/secp256k1.js'
+import * as secp256k1 from '@noble/secp256k1'
 // @ts-expect-error: implicit type import; not a ts package
 import * as base58 from 'base58-universal'
 // @ts-expect-error: implicit type import; not a ts package
@@ -30,70 +29,70 @@ const ECDSA_CURVE = {
   P521: 'P-521',
   // compatibility with @peculiar/webcrypto
   secp256k1: 'K-256',
-};
+}
 
-function getSecretKeySize({curve}) {
-  if(curve === ECDSA_CURVE.P256 || curve === ECDSA_CURVE.secp256k1 || curve === 'secp256k1') {
-    return 32;
+function getSecretKeySize({ curve }) {
+  if (curve === ECDSA_CURVE.P256 || curve === ECDSA_CURVE.secp256k1 || curve === 'secp256k1') {
+    return 32
   }
-  if(curve === ECDSA_CURVE.P384) {
-    return 48;
+  if (curve === ECDSA_CURVE.P384) {
+    return 48
   }
-  if(curve === ECDSA_CURVE.P521) {
-    return 66;
+  if (curve === ECDSA_CURVE.P521) {
+    return 66
   }
-  throw new TypeError(`Unsupported curve "${curve}".`);
+  throw new TypeError(`Unsupported curve "${curve}".`)
 }
 
 function toPublicKeyBytes({ jwk } = {} as any): Uint8Array {
   if (jwk?.kty !== 'EC') {
-    throw new TypeError('"jwk.kty" must be "EC".');
+    throw new TypeError('"jwk.kty" must be "EC".')
   }
-  const { crv: curve } = jwk;
+  const { crv: curve } = jwk
   const secretKeySize = getSecretKeySize({ curve })
   // convert `x` coordinate to compressed public key
-  const x = base64url.decode(jwk.x);
-  const y = base64url.decode(jwk.y);
+  const x = base64url.decode(jwk.x)
+  const y = base64url.decode(jwk.y)
   // public key size is always secret key size + 1
-  const publicKeySize = secretKeySize + 1;
-  const publicKey = new Uint8Array(publicKeySize);
+  const publicKeySize = secretKeySize + 1
+  const publicKey = new Uint8Array(publicKeySize)
   // use even / odd status of `y` coordinate for compressed header
-  const even = y[y.length - 1] % 2 === 0;
-  publicKey[0] = even ? 2 : 3;
+  const even = y[y.length - 1] % 2 === 0
+  publicKey[0] = even ? 2 : 3
   // write `x` coordinate at end of multikey buffer to zero-fill it
-  publicKey.set(x, publicKey.length - x.length);
-  return publicKey;
+  publicKey.set(x, publicKey.length - x.length)
+  return publicKey
 }
 
-export function toSecretKeyBytes({jwk} = {} as any): Uint8Array {
-  if(jwk?.kty !== 'EC') {
-    throw new TypeError('"jwk.kty" must be "EC".');
+export function toSecretKeyBytes({ jwk } = {} as any): Uint8Array {
+  if (jwk?.kty !== 'EC') {
+    throw new TypeError('"jwk.kty" must be "EC".')
   }
-  const {crv: curve} = jwk;
-  const secretKeySize = getSecretKeySize({curve});
-  const d = base64url.decode(jwk.d);
-  const secretKey = new Uint8Array(secretKeySize);
+  const { crv: curve } = jwk
+  const secretKeySize = getSecretKeySize({ curve })
+  const d = base64url.decode(jwk.d)
+  const secretKey = new Uint8Array(secretKeySize)
   // write `d` at end of multikey buffer to zero-fill it
-  secretKey.set(d, secretKey.length - d.length);
-  return secretKey;
+  secretKey.set(d, secretKey.length - d.length)
+  return secretKey
 }
 
 function bigIntToBytes(num, length = null) {
-  let hex = num.toString(16);
-  if (hex.length % 2) hex = '0' + hex;
+  let hex = num.toString(16)
+  if (hex.length % 2) hex = `0${hex}`
 
-  let bytes = Uint8Array.from(hex.match(/.{2}/g).map(b => parseInt(b, 16)));
+  let bytes = Uint8Array.from(hex.match(/.{2}/g).map((b) => parseInt(b, 16)))
 
   if (length !== null) {
     if (bytes.length > length) {
-      throw new Error('BigInt too large');
+      throw new Error('BigInt too large')
     }
-    const padded = new Uint8Array(length);
-    padded.set(bytes, length - bytes.length); // left pad
-    bytes = padded;
+    const padded = new Uint8Array(length)
+    padded.set(bytes, length - bytes.length) // left pad
+    bytes = padded
   }
 
-  return bytes;
+  return bytes
 }
 
 export const publicKeyHexFrom = {

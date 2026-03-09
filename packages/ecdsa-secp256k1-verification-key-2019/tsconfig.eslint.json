@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "include": [
     "src",
+    "src/__tests__",
     ".eslintrc.js",
     ".prettierrc.js",
-  ]
+  ],
+  "exclude": []
 }

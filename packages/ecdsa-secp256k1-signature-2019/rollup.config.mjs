@@ -11,7 +11,7 @@ const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
 
 const external = [
   ...Object.keys(pkg.dependencies ?? {}),
-  ...Object.keys(pkg.peerDependencies ?? {}),
+  ...Object.keys(pkg.peerDependencies ?? {})
 ];
 
 const outDir = 'dist';
@@ -51,7 +51,7 @@ function injectJsigsImport() {
       if (!content.startsWith(header)) {
         fs.writeFileSync(path, header + content);
       }
-    },
+    }
   };
 }
 
@@ -82,13 +82,13 @@ export default {
       file: `${outDir}/${cjsProdFileName}`,
       format: "cjs",
       exports: "named",
-      sourcemap: true,
+      sourcemap: true
       // plugins: [terser()]
     },
     {
       file: `${outDir}/ecdsa-secp256k1-signature-2019.esm.js`,
       format: "es",
       sourcemap: true
-    },
-  ],
+    }
+  ]
 };
