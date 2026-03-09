@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import randomBytes from 'randombytes'
 
 import { EcdsaSecp256k1VerificationKey2019 } from '../verificationKey'
