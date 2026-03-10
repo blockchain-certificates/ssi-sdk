@@ -167,7 +167,7 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
           ),
         )
 
-        const { signature } = await secp256k1.signAsync(digest, base58.decode(privateKeyBase58))
+        const signature = await secp256k1.signAsync(digest, base58.decode(privateKeyBase58), { prehash: false })
         const encodedSignature = base64url.encode(Buffer.from(signature))
 
         return `${encodedHeader}..${encodedSignature}`
@@ -208,8 +208,15 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
 
         let verified: boolean
         try {
-          verified = secp256k1.verify(Buffer.from(base64url.decode(encodedSignature, 'hex'), 'hex'), digest, base58.decode(publicKeyBase58))
+          verified = secp256k1.verify(
+            Buffer.from(base64url.decode(encodedSignature, 'hex'), 'hex'),
+            digest,
+            base58.decode(publicKeyBase58),
+            { prehash: false },
+          )
         } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e)
           verified = false
         }
 

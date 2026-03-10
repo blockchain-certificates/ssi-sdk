@@ -3,6 +3,7 @@
   "include": ["src", "types"],
   "exclude": ["src/__tests__", "node_modules"],
   "compilerOptions": {
+    "target": "es2020",
     "module": "esnext",
     "lib": ["dom", "esnext"],
     "importHelpers": true,
