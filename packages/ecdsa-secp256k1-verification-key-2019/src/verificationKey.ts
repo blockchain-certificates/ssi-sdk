@@ -208,8 +208,14 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
 
         let verified: boolean
         try {
-          verified = secp256k1.verify(Buffer.from(base64url.decode(encodedSignature, 'hex'), 'hex'), digest, base58.decode(publicKeyBase58))
+          verified = secp256k1.verify(
+            Buffer.from(base64url.decode(encodedSignature, 'hex'), 'hex'),
+            digest,
+            base58.decode(publicKeyBase58),
+            { prehash: false },
+          )
         } catch (e) {
+          console.error(e);
           verified = false
         }
 

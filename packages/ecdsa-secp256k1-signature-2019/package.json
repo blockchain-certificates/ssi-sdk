@@ -33,7 +33,7 @@
     "prepublishOnly": "npm run lint && npm run test"
   },
   "dependencies": {
-    "@blockcerts/ecdsa-secp256k1-verification-key-2019": "^1.0.0",
+    "@blockcerts/ecdsa-secp256k1-verification-key-2019": "^0.1.9",
     "jsonld": "^9.0.0",
     "jsonld-signatures": "^11.5.0"
   },
