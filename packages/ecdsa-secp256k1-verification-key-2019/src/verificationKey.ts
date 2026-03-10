@@ -215,7 +215,8 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
             { prehash: false },
           )
         } catch (e) {
-          console.error(e);
+          // eslint-disable-next-line no-console
+          console.error(e)
           verified = false
         }
 
