@@ -7,6 +7,7 @@ import randomBytes from 'randombytes'
 import cryptoLd from 'crypto-ld'
 // @ts-expect-error: implicit type import; not a ts package
 import * as base58 from 'base58-universal'
+import { Buffer } from 'buffer'
 
 const SUITE_ID = 'EcdsaSecp256k1VerificationKey2019'
 

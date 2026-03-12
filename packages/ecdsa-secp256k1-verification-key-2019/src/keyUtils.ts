@@ -3,6 +3,7 @@ import * as secp256k1 from '@noble/secp256k1'
 import * as base58 from 'base58-universal'
 // @ts-expect-error: implicit type import; not a ts package
 import * as base64url from 'base64url-universal'
+import { Buffer } from 'buffer'
 
 const compressedHexEncodedPublicKeyLength = 66
 
