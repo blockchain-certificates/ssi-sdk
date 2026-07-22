@@ -42,7 +42,7 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
   })
 
   describe('generate', () => {
-    test.only('generates a key pair', async () => {
+    test('generates a key pair', async () => {
       const key = await EcdsaSecp256k1VerificationKey2019.generate({
         controller: 'did:example:hello',
         id: 'did:example:hello#123',
