@@ -42,7 +42,7 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
   })
 
   describe('generate', () => {
-    test.only('generates a key pair', async () => {
+    test('generates a key pair', async () => {
       const key = await EcdsaSecp256k1VerificationKey2019.generate({
         controller: 'did:example:hello',
         id: 'did:example:hello#123',
@@ -89,7 +89,7 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
       const key = EcdsaSecp256k1VerificationKey2019.from(privateKeyPair)
 
       expect(key.export({ publicKey: true })).toMatchInlineSnapshot(`
-        Object {
+        {
           "controller": "did:example:signer",
           "id": "did:example:signer#123",
           "publicKeyBase58": "cY3XbJUu1pz9VU18qTU12pXmvi5rVohUSpekndrnM1Vt",
@@ -103,7 +103,7 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
       const key = EcdsaSecp256k1VerificationKey2019.from(privateKeyPair)
 
       expect(key.export({ privateKey: true })).toMatchInlineSnapshot(`
-        Object {
+        {
           "controller": "did:example:signer",
           "id": "did:example:signer#123",
           "privateKeyBase58": "E8HCuTCVWHSAZSobCqFrriv7vMWhfbRLCU1YT9Upm625",
@@ -117,7 +117,7 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
       const key = EcdsaSecp256k1VerificationKey2019.from(privateKeyPair)
 
       expect(key.export({ privateKey: true, publicKey: true, includeContext: true })).toMatchInlineSnapshot(`
-        Object {
+        {
           "@context": "https://ns.did.ai/suites/secp256k1-2019/v1",
           "controller": "did:example:signer",
           "id": "did:example:signer#123",
@@ -133,7 +133,7 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
       const key = EcdsaSecp256k1VerificationKey2019.from(privateKeyPair)
 
       expect(key.export({ privateKey: true, publicKey: true })).toMatchInlineSnapshot(`
-        Object {
+        {
           "controller": "did:example:signer",
           "id": "did:example:signer#123",
           "privateKeyBase58": "E8HCuTCVWHSAZSobCqFrriv7vMWhfbRLCU1YT9Upm625",
@@ -149,14 +149,14 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
         const key = EcdsaSecp256k1VerificationKey2019.from(privateKeyPair)
 
         expect(() => key.export()).toThrowErrorMatchingInlineSnapshot(
-          '"export requires specifying either \\"publicKey\\" or \\"privateKey\\"."',
+          `[TypeError: export requires specifying either "publicKey" or "privateKey".]`,
         )
       })
 
       test('when trying to export privateKey when constructed from publicKeyPair', () => {
         const key = EcdsaSecp256k1VerificationKey2019.from(publicKeyPair)
 
-        expect(() => key.export({ privateKey: true })).toThrowErrorMatchingInlineSnapshot('"No privateKey to export."')
+        expect(() => key.export({ privateKey: true })).toThrowErrorMatchingInlineSnapshot(`[TypeError: No privateKey to export.]`)
       })
     })
   })
@@ -178,7 +178,7 @@ describe('EcdsaSecp256k1VerificationKey2019', () => {
       })
 
       expect(imported.export({ publicKey: true, privateKey: true })).toMatchInlineSnapshot(`
-        Object {
+        {
           "controller": "did:example:hello",
           "id": "did:example:hello#123",
           "privateKeyBase58": "2YMr8WzjdFuMQkLdDWzvUsVq5bpdXfeZANeFyLb2ouwr",
