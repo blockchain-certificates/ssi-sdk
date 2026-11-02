@@ -1,4 +1,3 @@
-// @ts-nocheck
 import base64url from 'base64url'
 import * as secp256k1 from '@noble/secp256k1'
 import createHash from 'create-hash'
@@ -39,6 +38,16 @@ type EcdsaSecp256k1VerificationKey2019HexKeyOptions = {
 }
 
 export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
+  static suite = SUITE_ID
+
+  static SUITE_CONTEXT = 'https://ns.did.ai/suites/secp256k1-2019/v1'
+
+  declare id: string
+
+  declare controller: string
+
+  declare revoked?: boolean
+
   public type: string
 
   public publicKeyBase58?: string
@@ -215,7 +224,6 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
             { prehash: false },
           )
         } catch (e) {
-          // eslint-disable-next-line no-console
           console.error(e)
           verified = false
         }
@@ -226,6 +234,3 @@ export class EcdsaSecp256k1VerificationKey2019 extends cryptoLd.LDKeyPair {
     }
   }
 }
-
-EcdsaSecp256k1VerificationKey2019.suite = SUITE_ID
-EcdsaSecp256k1VerificationKey2019.SUITE_CONTEXT = 'https://ns.did.ai/suites/secp256k1-2019/v1'
